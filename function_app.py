@@ -1,13 +1,22 @@
-import logging
 import azure.functions as func
+import logging
 import pandas as pd
 from io import StringIO
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
+@app.route(route="pandas")
+def pandas(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
-    # Ejemplo: recibir contenido CSV desde el body del request
-    csv_data = req.get_body().decode('utf-8')
+    # Obtener archivo enviado como form-data
+    file = req.files.get('file')
+    if not file:
+        return func.HttpResponse("No se envió archivo 'file'", status_code=400)
+
+    # Leer bytes y decodificar
+    content = file.stream.read()
+    csv_data = content.decode('utf-8', errors='ignore')
 
     # Convertir a DataFrame
     df = pd.read_csv(StringIO(csv_data))
