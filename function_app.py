@@ -1,27 +1,42 @@
 import azure.functions as func
 import logging
 import pandas as pd
-from io import StringIO
+from io import BytesIO, StringIO
+import cgi
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-@app.route(route="pandas")
-def pandas(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request..')
+@app.route(route="pandas", methods=["POST"])
+def pandas_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info("Procesando archivo CSV...")
 
-    # Obtener archivo enviado como form-data
-    file = req.files.get('file')
-    if not file:
+    # Obtener el cuerpo crudo
+    body = req.get_body()
+
+    # Parsear multipart/form-data
+    content_type = req.headers.get("Content-Type")
+    if not content_type:
+        return func.HttpResponse("Falta Content-Type", status_code=400)
+
+    _, params = cgi.parse_header(content_type)
+    boundary = params.get("boundary")
+
+    if not boundary:
+        return func.HttpResponse("No se encontró boundary en multipart/form-data", status_code=400)
+
+    # Parsear partes del multipart
+    form_data = cgi.parse_multipart(BytesIO(body), {"boundary": boundary.encode()})
+
+    if "file" not in form_data:
         return func.HttpResponse("No se envió archivo 'file'", status_code=400)
 
-    # Leer bytes y decodificar
-    content = file.stream.read()
-    csv_data = content.decode('utf-8', errors='ignore')
+    # Obtener contenido del archivo
+    file_content = form_data["file"][0]
+    csv_text = file_content.decode("utf-8", errors="ignore")
 
     # Convertir a DataFrame
-    df = pd.read_csv(StringIO(csv_data))
+    df = pd.read_csv(StringIO(csv_text))
 
-    # Calcular estadísticas simples
     stats = {
         "filas": len(df),
         "columnas": list(df.columns),
