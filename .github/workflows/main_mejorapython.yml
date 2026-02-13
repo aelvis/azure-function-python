@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
   PYTHON_VERSION: '3.10'
 
 jobs:
@@ -23,11 +22,16 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Validate dependencies locally
-        run: pip install -r requirements.txt
-        
+      - name: Install dependencies into .python_packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --target=".python_packages/lib/site-packages" -r requirements.txt
+
+      - name: Verify installed packages
+        run: |
+          ls -la .python_packages/lib/site-packages | head
+
       - name: Create ZIP for Azure Functions
-        working-directory: ${{ github.workspace }}
         run: |
           ls -la
           zip -r release.zip . \
@@ -68,4 +72,3 @@ jobs:
           app-name: 'mejorapython'
           slot-name: 'Production'
           package: release.zip
-
