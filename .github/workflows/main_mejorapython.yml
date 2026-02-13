@@ -68,8 +68,14 @@ jobs:
         name: python-app
         path: .
     
-    - name: Move ZIP to root
-      run: mv python-app/release.zip ./release.zip
+    - name: Identify downloaded ZIP
+      id: findzip
+      run: |
+        FILE=$(ls -1 *.zip | head -n 1)
+        echo "zipfile=$FILE" >> $GITHUB_OUTPUT
+    
+    - name: Rename ZIP to release.zip
+      run: mv "${{ steps.findzip.outputs.zipfile }}" release.zip
     
     - name: Cleanup artifact folder
       run: rm -rf python-app
@@ -80,12 +86,10 @@ jobs:
         client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_1DD7A005099B4A5A9B14FAACF0C8BC6F }}
         tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6FC82498CA1948329E73AA8067FE9B8D }}
         subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E028BD40589545FD8BEBE5303820CA06 }}
-    
+      
     - name: Deploy to Azure Functions
       uses: Azure/functions-action@v1
       with:
         app-name: 'mejorapython'
         slot-name: 'Production'
         package: release.zip
-
-
