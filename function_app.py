@@ -1,6 +1,7 @@
 import azure.functions as func
 import logging
 from io import StringIO
+import pandas as pd
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
