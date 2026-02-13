@@ -36,8 +36,13 @@ jobs:
       - name: Create ZIP for Azure Functions
         working-directory: ${{ github.workspace }}
         run: |
-          ls -la
-          zip -r release.zip function_app.py host.json requirements.txt .funcignore .python_packages
+          rm -f release.zip
+          zip -r release.zip \
+            function_app.py \
+            host.json \
+            requirements.txt \
+            .funcignore \
+            .python_packages
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -71,3 +76,4 @@ jobs:
           app-name: 'mejorapython'
           slot-name: 'Production'
           package: release.zip
+
