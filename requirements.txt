@@ -4,3 +4,7 @@
 
 azure-functions
 pandas
+numpy
+python-dateutil
+pytz
+tzdata
