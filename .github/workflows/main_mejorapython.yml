@@ -23,28 +23,22 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies into .python_packages
-        working-directory: ${{ github.workspace }}
         run: |
           python -m pip install --upgrade pip
           python -m pip install --target=".python_packages/lib/site-packages" -r requirements.txt
 
       - name: Verify installed packages
-        working-directory: ${{ github.workspace }}
         run: |
           ls -la .python_packages/lib/site-packages | head
 
       - name: Create ZIP for Azure Functions
-        working-directory: ${{ github.workspace }}
         run: |
-          rm -f release.zip
-          rm -rf release
-          rm -rf python-app
-          zip -r release.zip \
-            function_app.py \
-            host.json \
-            requirements.txt \
-            .funcignore \
-            .python_packages
+          ls -la
+          zip -r release.zip . \
+            -x "venv/*" \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "__pycache__/*"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -78,5 +72,3 @@ jobs:
           app-name: 'mejorapython'
           slot-name: 'Production'
           package: release.zip
-
-
