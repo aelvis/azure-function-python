@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Validate dependencies locally (optional)
+      - name: Validate dependencies locally
         run: pip install -r requirements.txt
 
       - name: Create ZIP for Azure Functions
