@@ -23,14 +23,15 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies (only to validate)
+      - name: Validate dependencies locally (optional)
         run: pip install -r requirements.txt
 
       - name: Create ZIP for Azure Functions
         run: |
           zip -r release.zip . \
             -x "venv/*" \
-            -x "*.git*" \
+            -x ".git/*" \
+            -x ".github/*" \
             -x "__pycache__/*"
 
       - name: Upload artifact
