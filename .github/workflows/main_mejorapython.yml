@@ -25,9 +25,11 @@ jobs:
 
       - name: Validate dependencies locally
         run: pip install -r requirements.txt
-
+        
       - name: Create ZIP for Azure Functions
+        working-directory: ${{ github.workspace }}
         run: |
+          ls -la
           zip -r release.zip . \
             -x "venv/*" \
             -x ".git/*" \
@@ -66,3 +68,4 @@ jobs:
           app-name: 'mejorapython'
           slot-name: 'Production'
           package: release.zip
+
