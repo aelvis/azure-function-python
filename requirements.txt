@@ -8,3 +8,15 @@ numpy
 python-dateutil
 pytz
 tzdata
+azure-storage.blob
+azure-storage-file-share
+xlsxwriter
+psutil
+dask[dataframe]
+matplotlib 
+pyautogui
+google-cloud-storage
+google-auth
+cryptography
+boto3
+paramiko
